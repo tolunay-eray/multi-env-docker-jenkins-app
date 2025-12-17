@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: logs
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 5
+  app:
+    build: .
+    ports:
+      - "8080:5000"
+    env_file:
+      - .env.dev
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
