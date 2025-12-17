@@ -5,7 +5,7 @@ pipeline {
         choice(
             name: 'ENV',
             choices: ['dev', 'test', 'prod'],
-            description: 'Hangi ortamda deploy edilsin?'
+            description: 'Choose the environment to deploy'
         )
     }
 
@@ -17,17 +17,22 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/USERNAME/REPO.git'
+                git branch: 'main',
+                    url: 'https://github.com/tolunay-eray/multi-env-docker-jenkins-app.git'
+            }
+        }
+
+        stage('Clean Previous Containers') {
+            steps {
+                sh 'docker compose down || true'
             }
         }
 
         stage('Build & Deploy') {
             steps {
-                sh '''
-                docker compose down
+                sh """
                 docker compose --env-file ${ENV_FILE} up -d --build
-                '''
+                """
             }
         }
     }
